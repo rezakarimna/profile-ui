@@ -5,44 +5,98 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+  ThemeMode _themeMode = ThemeMode.dark;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // Try running your application with "flutter run". You'll see the
-          // application has a blue toolbar. Then, without quitting the app, try
-          // changing the primarySwatch below to Colors.green and then invoke
-          // "hot reload" (press "r" in the console where you ran "flutter run",
-          // or simply save your changes to "hot reload" in a Flutter IDE).
-          // Notice that the counter didn't reset back to zero; the application
-          // is not restarted.
-          primarySwatch: Colors.blue,
-          primaryColor: Colors.pink.shade400,
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: Color.fromARGB(255, 30, 30, 30),
-          appBarTheme: AppBarTheme(backgroundColor: Colors.black),
-          fontFamily: 'primary',
-          textTheme: const TextTheme(
-              bodyText1: TextStyle(
-                  fontSize: 13, color: Color.fromARGB(200, 255, 255, 255)),
-              bodyText2: TextStyle(fontSize: 15),
-              headline6: TextStyle(fontWeight: FontWeight.bold),
-              subtitle1: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-      home: MyHomePage(),
+      theme: _themeMode == ThemeMode.dark
+          ? MyAppThemeConfig.dark().getTheme()
+          : MyAppThemeConfig.light().getTheme(),
+      home: MyHomePage(
+        toggleThemeMode: () {
+          setState(() {
+            if (_themeMode == ThemeMode.dark)
+              _themeMode = ThemeMode.light;
+            else
+              _themeMode = ThemeMode.dark;
+          });
+        },
+      ),
     );
   }
 }
 
 enum _SkillType { photoshop, xd, illustrator, afterEffects, lightRoom }
 
+class MyAppThemeConfig {
+  final Color primaryColor = Colors.pink.shade400;
+  final Color primaryTextColor;
+  final Color secoandaryTextColor;
+  final Color surfaceColor;
+  final Color backgroundColor;
+  final Color appBarColor;
+  final Brightness brightness;
+
+  MyAppThemeConfig.dark()
+      : primaryTextColor = Colors.white,
+        secoandaryTextColor = Colors.white70,
+        surfaceColor = Color(0X0dffffff),
+        backgroundColor = Color.fromARGB(255, 30, 30, 30),
+        appBarColor = Colors.black,
+        brightness = Brightness.dark;
+
+  MyAppThemeConfig.light()
+      : primaryTextColor = Colors.grey.shade900,
+        secoandaryTextColor = Colors.grey.shade900.withOpacity(0.8),
+        surfaceColor = Color(0X0d00000),
+        backgroundColor = Colors.white,
+        appBarColor = Color.fromARGB(255, 235, 235, 235),
+        brightness = Brightness.light;
+
+  ThemeData getTheme() {
+    return ThemeData(
+        primarySwatch: Colors.blue,
+        primaryColor: primaryColor,
+        brightness: brightness,
+        scaffoldBackgroundColor: backgroundColor,
+        appBarTheme: AppBarTheme(backgroundColor: appBarColor , foregroundColor: primaryTextColor , elevation: 0),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(primaryColor))),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none),
+          filled: true,
+          fillColor: const Color.fromARGB(100, 100, 100, 100),
+        ),
+        fontFamily: 'primary',
+        textTheme: TextTheme(
+            bodyText1: TextStyle(fontSize: 13, color: secoandaryTextColor),
+            bodyText2: TextStyle(fontSize: 15, color: primaryTextColor),
+            headline6:
+                TextStyle(fontWeight: FontWeight.bold, color: primaryTextColor),
+            subtitle1: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: primaryTextColor)));
+  }
+}
+
 class MyHomePage extends StatefulWidget {
+  final Function() toggleThemeMode;
+
+  MyHomePage({Key? key, required this.toggleThemeMode}) : super(key: key);
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -60,161 +114,207 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     var data = 'Photoshop';
     return Scaffold(
-        appBar: AppBar(title: const Text("Curriculum vitae"), actions: const [
+        appBar: AppBar(title: const Text("Curriculum vitae"), actions: [
           Icon(CupertinoIcons.chat_bubble),
-          Padding(
-            padding: EdgeInsets.fromLTRB(8, 0, 16, 0),
-            child: Icon(CupertinoIcons.ellipsis_vertical),
+          InkWell(
+            onTap: widget.toggleThemeMode,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(8, 0, 16, 0),
+              child: Icon(CupertinoIcons.ellipsis_vertical),
+            ),
           )
         ]),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(18),
-                      child: Image.asset(
-                        "assets/images/profile.jpg",
-                        width: 80,
-                        height: 80,
-                      )),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Brice seraphin',
-                          style: Theme.of(context).textTheme.subtitle1,
-                        ),
-                        SizedBox(
-                          height: 2,
-                        ),
-                        Text('Product & print'),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              CupertinoIcons.location,
-                              size: 14,
-                              color:
-                                  Theme.of(context).textTheme.bodyText1!.color,
-                            ),
-                            SizedBox(
-                              width: 3,
-                            ),
-                            Text(
-                              'Paris , France',
-                              style: Theme.of(context).textTheme.caption,
-                            ),
-                          ],
-                        )
-                      ],
+        body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Image.asset(
+                          "assets/images/profile.jpg",
+                          width: 80,
+                          height: 80,
+                        )),
+                    const SizedBox(
+                      width: 16,
                     ),
-                  ),
-                  Icon(
-                    CupertinoIcons.heart,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Brice seraphin',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          const SizedBox(
+                            height: 2,
+                          ),
+                          const Text('Product & print'),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.location,
+                                size: 14,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1!
+                                    .color,
+                              ),
+                              const SizedBox(
+                                width: 3,
+                              ),
+                              Text(
+                                'Paris , France',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      CupertinoIcons.heart,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
-              child: Text(
-                'Short monologues are great for acting tests You, like most actors and actresses, have probably searched words like "monologue for acting test',
-                style: Theme.of(context).textTheme.bodyText1,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+                child: Text(
+                  'Short monologues are great for acting tests You, like most actors and actresses, have probably searched words like "monologue for acting test',
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
               ),
-            ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(32, 16, 32, 12),
-              child: Row(
-                children: [
-                  Text(
-                    "Skils",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText2!
-                        .copyWith(fontWeight: FontWeight.w900),
-                  ),
-                  SizedBox(
-                    width: 2,
-                  ),
-                  Icon(
-                    CupertinoIcons.chevron_down,
-                    size: 12,
-                  )
-                ],
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(32, 16, 32, 12),
+                child: Row(
+                  children: [
+                    Text(
+                      "Skils",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText2!
+                          .copyWith(fontWeight: FontWeight.w900),
+                    ),
+                    const SizedBox(
+                      width: 2,
+                    ),
+                    const Icon(
+                      CupertinoIcons.chevron_down,
+                      size: 12,
+                    )
+                  ],
+                ),
               ),
-            ),
-            SizedBox(
-              height: 12,
-            ),
-            Center(
-              child: Wrap(
-                direction: Axis.horizontal,
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  Skill(
-                    type: _SkillType.photoshop,
-                    title: 'Photoshop',
-                    imagePath: 'assets/images/photoshop.png',
-                    shadowColor: Colors.blue,
-                    isActive: _skill == _SkillType.photoshop,
-                    onTop: () {
-                      updateSelectSkill(_SkillType.photoshop);
-                    },
-                  ),
-                  Skill(
-                      type: _SkillType.xd,
-                      title: 'Adobe XD',
-                      imagePath: 'assets/images/adobe_xd.png',
-                      shadowColor: Colors.pink,
-                      isActive: _skill == _SkillType.xd,
-                      onTop: () {
-                        updateSelectSkill(_SkillType.xd);
-                      }),
-                  Skill(
-                    type: _SkillType.illustrator,
-                    title: 'Illustrator',
-                    imagePath: 'assets/images/illustrator.png',
-                    shadowColor: Colors.orange,
-                    isActive: _skill == _SkillType.illustrator,
-                    onTop: () {
-                      updateSelectSkill(_SkillType.illustrator);
-                    },
-                  ),
-                  Skill(
-                      type: _SkillType.afterEffects,
-                      title: 'After Effects',
-                      imagePath: 'assets/images/after_effects.png',
-                      shadowColor: Colors.blue.shade800,
-                      isActive: _skill == _SkillType.afterEffects,
-                      onTop: () {
-                        updateSelectSkill(_SkillType.afterEffects);
-                      }),
-                  Skill(
-                      type: _SkillType.lightRoom,
-                      title: 'Lightroom',
-                      imagePath: 'assets/images/lightroom.png',
+              const SizedBox(
+                height: 12,
+              ),
+              Center(
+                child: Wrap(
+                  direction: Axis.horizontal,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    Skill(
+                      type: _SkillType.photoshop,
+                      title: 'Photoshop',
+                      imagePath: 'assets/images/photoshop.png',
                       shadowColor: Colors.blue,
-                      isActive: _skill == _SkillType.lightRoom,
+                      isActive: _skill == _SkillType.photoshop,
                       onTop: () {
-                        updateSelectSkill(_SkillType.lightRoom);
-                      }),
-                ],
+                        updateSelectSkill(_SkillType.photoshop);
+                      },
+                    ),
+                    Skill(
+                        type: _SkillType.xd,
+                        title: 'Adobe XD',
+                        imagePath: 'assets/images/adobe_xd.png',
+                        shadowColor: Colors.pink,
+                        isActive: _skill == _SkillType.xd,
+                        onTop: () {
+                          updateSelectSkill(_SkillType.xd);
+                        }),
+                    Skill(
+                      type: _SkillType.illustrator,
+                      title: 'Illustrator',
+                      imagePath: 'assets/images/illustrator.png',
+                      shadowColor: Colors.orange,
+                      isActive: _skill == _SkillType.illustrator,
+                      onTop: () {
+                        updateSelectSkill(_SkillType.illustrator);
+                      },
+                    ),
+                    Skill(
+                        type: _SkillType.afterEffects,
+                        title: 'After Effects',
+                        imagePath: 'assets/images/after_effects.png',
+                        shadowColor: Colors.blue.shade800,
+                        isActive: _skill == _SkillType.afterEffects,
+                        onTop: () {
+                          updateSelectSkill(_SkillType.afterEffects);
+                        }),
+                    Skill(
+                        type: _SkillType.lightRoom,
+                        title: 'Lightroom',
+                        imagePath: 'assets/images/lightroom.png',
+                        shadowColor: Colors.blue,
+                        isActive: _skill == _SkillType.lightRoom,
+                        onTop: () {
+                          updateSelectSkill(_SkillType.lightRoom);
+                        }),
+                  ],
+                ),
               ),
-            )
-          ],
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(32, 16, 32, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "personal Information",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText2!
+                          .copyWith(fontWeight: FontWeight.w900),
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    const TextField(
+                        decoration: InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(CupertinoIcons.at),
+                    )),
+                    SizedBox(height: 8,),
+                    const TextField(
+                        decoration: InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: Icon(CupertinoIcons.lock),
+                    )),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                            onPressed: () {}, child: Text('Save')))
+                  ],
+                ),
+              )
+            ],
+          ),
         ));
   }
 }
@@ -247,7 +347,7 @@ class Skill extends StatelessWidget {
         height: 110,
         decoration: isActive
             ? BoxDecoration(
-                color: Color.fromARGB(25, 255, 255, 255),
+                color: const Color.fromARGB(25, 100, 100, 100),
                 borderRadius: BorderRadius.circular(12))
             : null,
         child: Column(
@@ -257,7 +357,7 @@ class Skill extends StatelessWidget {
               decoration: isActive
                   ? BoxDecoration(boxShadow: [
                       BoxShadow(
-                          color: shadowColor.withOpacity(0.5), blurRadius: 20)
+                          color: shadowColor.withOpacity(0.5), blurRadius: 25)
                     ])
                   : null,
               child: Image.asset(
@@ -266,7 +366,7 @@ class Skill extends StatelessWidget {
                 height: 40,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
             Text(title)
